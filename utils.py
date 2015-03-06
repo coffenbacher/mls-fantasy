@@ -20,6 +20,8 @@ def extract_mls_fantasy_data():
     teams = res['teams']
     first_fields = ['id', 'name',]
     fieldnames = first_fields + sorted(list(set(teams[0].keys()).difference(first_fields)))
+    fieldnames.remove('next_event_fixture')
+    fieldnames.remove('current_event_fixture')
     results.append({'name': 'teams', 'data': teams, 'fieldnames': fieldnames})
     
     return results
