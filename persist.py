@@ -6,17 +6,18 @@ import logging
 import datetime
 import shutil
 
-def persist(data, fieldnames, root, project_name=None, write_header=True, output_directory='./',):
+def persist(data, fieldnames, root, project_name=None, write_header=True, output_directory=os.getenv('OUTPUT_DIRECTORY','./'),):
     # Set up root data dir
-    root_filename = root + '/' + project_name + '/' + '/automated/' + root + '/'
+    git_dir = output_directory + root + '/' + project_name + '/'
+    root_filename = git_dir + '/automated/' + root + '/'
 
     # Clone data repository for updates - continue if already exists
     from sh import git
     try:
-        shutil.rmtree(root + '/' + project_name + '/')
+        shutil.rmtree(git_dir)
     except:
         pass
-    git.clone('https://'+os.getenv('MACHINE_AUTH')+'@github.com/coffenbacher/%s.git' % project_name, root + '/%s/' % project_name)
+    git.clone('https://'+os.getenv('MACHINE_AUTH')+'@github.com/coffenbacher/%s.git' % project_name, git_dir)
     
     # Create our root if required
     if not os.path.exists(root_filename):
