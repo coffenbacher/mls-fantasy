@@ -17,6 +17,10 @@ def persist(data, fieldnames, root, project_name=None, write_header=True, output
         shutil.rmtree(git_dir)
     except:
         pass
+    
+    if os.getenv('REMOTE'):
+        git('config', '--global', 'user.email', os.getenv('MACHINE_AUTH').split(':')[0])
+        git('config', '--global', 'user.name', os.getenv('MACHINE_AUTH').split(':')[0])
     git.clone('https://'+os.getenv('MACHINE_AUTH')+'@github.com/coffenbacher/%s.git' % project_name, git_dir)
     
     # Create our root if required
