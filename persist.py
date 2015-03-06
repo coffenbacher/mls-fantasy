@@ -47,7 +47,7 @@ def persist(data, fieldnames, root, project_name=None, write_header=True, output
     # Write everything to json
     with open(root_filename + root + '.json', 'w') as jsonfile:
         relevant = [{f: d.get(f, None) for f in fieldnames} for d in data]
-        jsonfile.write(json.dumps(relevant))
+        jsonfile.write(json.dumps(relevant, sort_keys=True, indent=4, separators=(',', ': ')))
     
     with open(root_filename + root + '_meta.json', 'w') as metafile:
         d = {
