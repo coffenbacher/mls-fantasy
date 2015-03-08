@@ -1,6 +1,5 @@
 import os
 from flask import Flask
-from sync import main
 from rq import Queue
 from redis import Redis, Connection
 import redis
