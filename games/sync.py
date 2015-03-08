@@ -2,10 +2,11 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import re
+import os
 import logging; logging.basicConfig(); log = logging.getLogger(); log.setLevel('INFO')
 #
 def extract_game_logs(new=True):
-    seasons = range(2015, 2020)
+    seasons = range(int(os.getenv('START_YEAR', 2014)), 2020)
     urls = []
     for s in seasons:
         for comp_type in (44, 45, 46):
