@@ -17,7 +17,7 @@ def trigger_sync():
 @app.route("/sync/games/")
 def trigger_sync_games():
     q = Queue(connection=redis.from_url(os.getenv('REDISCLOUD_URL')))  # no args implies the default queue
-    q.enqueue(sync_new_games)
+    q.enqueue(sync_new_games, timeout=3600)
     return '1'
 
 if __name__ == "__main__":
