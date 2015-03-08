@@ -6,7 +6,23 @@ import logging
 import datetime
 import shutil
 
-def persist(data, fieldnames, root, project_name=None, write_header=True, output_directory=os.getenv('OUTPUT_DIRECTORY','./'),):
+def persist(data, root, fieldnames=[], file_name=None, project_name=None, 
+                write_header=True, write_meta=True, write_json=True, 
+                write_csv=True, auto_add_file=False,
+                output_directory=os.getenv('OUTPUT_DIRECTORY','./'),):
+    """
+    data should have schema:
+    {
+        'data': [],
+        'name': 'e.g. coach_tenures',
+        'fieldnames': [], //names for each field in order
+    }
+    """
+    
+    # Use root if file_name not set
+    if not file_name:
+        file_name = root
+        
     # Set up root data dir
     git_dir = output_directory + root + '/' + project_name + '/'
     root_filename = git_dir + '/automated/' + root + '/'
@@ -35,32 +51,36 @@ def persist(data, fieldnames, root, project_name=None, write_header=True, output
                     filemode='w')
     
     # Write everything to csv
-    with open(root_filename + root + '.csv', 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore')
-        if write_header:
-            writer.writeheader()
-        for d in data:
-            asci = dict([(unidecode(k), unidecode(unicode(v))) for k, v in d.items()])
-            writer.writerow(asci)
+    if write_csv:
+        with open(root_filename + file_name + '.csv', 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore')
+            if write_header:
+                writer.writeheader()
+            for d in data:
+                asci = dict([(unidecode(k), unidecode(unicode(v))) for k, v in d.items()])
+                writer.writerow(asci)
 
 
     # Write everything to json
-    with open(root_filename + root + '.json', 'w') as jsonfile:
-        relevant = [{f: d.get(f, None) for f in fieldnames} for d in data]
-        jsonfile.write(json.dumps(relevant, sort_keys=True, indent=4, separators=(',', ': ')))
+    if write_json:
+        with open(root_filename + file_name + '.json', 'w') as jsonfile:
+            if isinstance(data, list) and fieldnames:
+                relevant = [{f: d.get(f, None) for f in fieldnames} for d in data]
+            else:
+                relevant = data
+            jsonfile.write(json.dumps(relevant, sort_keys=True, indent=4, separators=(',', ': ')))
     
-    with open(root_filename + root + '_meta.json', 'w') as metafile:
-        d = {
-                'created': datetime.datetime.now().strftime('%x %X'),
-                'rows': len(data),
-                'headers': ','.join(fieldnames),
-            }
-        metafile.write(json.dumps(d))
+    
+    if write_meta:    
+        with open(root_filename + file_name + '_meta.json', 'w') as metafile:
+            d = {
+                    'created': datetime.datetime.now().strftime('%x %X'),
+                    'rows': len(data),
+                    'headers': ','.join(fieldnames),
+                }
+            metafile.write(json.dumps(d))
         
     git = git.bake(**{'git-dir': root + '/%s/.git/' % project_name, 'work-tree': root + '/%s' % project_name})
-    git.commit(m='Auto updating %s data' % root, a=True)
+    git.add('-A')
+    git.commit(m='Auto updating %s data - file %s' % (root, file_name), a=True)
     git.push('origin', 'master')
-    
-    
-if __name__ == '__main__':
-    generate_csv()

@@ -1,10 +1,7 @@
 from persist import persist
 from utils import extract_mls_fantasy_data
 
-def main():
+def sync_players():
     results = extract_mls_fantasy_data()
     for r in results:
-        persist(r['data'], r['fieldnames'], r['name'], project_name='mls-data')
-
-if __name__ == '__main__':
-    main()
+        persist(r['data'], r['name'], fieldnames=r['fieldnames'], project_name='mls-data')

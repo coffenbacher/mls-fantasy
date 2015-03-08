@@ -1,1 +1,1 @@
-web: python server.py
+web: python server.py & rqworker -u $REDISCLOUD_URL & rqworker -u $REDISCLOUD_URL

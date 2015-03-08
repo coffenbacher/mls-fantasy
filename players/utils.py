@@ -1,5 +1,7 @@
 import json
 import requests
+from bs4 import BeautifulSoup
+import re
 
 def extract_mls_fantasy_data():
     results = []
@@ -25,6 +27,3 @@ def extract_mls_fantasy_data():
     results.append({'name': 'teams', 'data': teams, 'fieldnames': fieldnames})
     
     return results
-    
-if __name__ == '__main__':
-    print extract_mls_fantasy_data()['data']
