@@ -67,7 +67,10 @@ def summarize_weekly_data():
         week_file = StringIO.StringIO(c)
         week_dicts = list(csv.DictReader(week_file))
         # Get field names
-        fieldnames = ['round'] + c.replace('"', '').split('\n')[0].split(',') + ['event_%s' % key for key in DELTA_KEYS]
+        fieldnames = ['round'] + c.replace('"', '').split('\n')[0].replace('\r', '').split(',')
+        
+        # Add event specific fields
+        fieldnames += ['event_%s' % key for key in DELTA_KEYS]
         
         for w in week_dicts:
             w.update({'round': game_week})
